@@ -7,6 +7,7 @@ import { AppModule } from '@/infra/app.module'
 import { StudentFractory } from 'test/factories/make-student'
 import { DatabaseModule } from '@/infra/database/database.module'
 import { QuestionFactory } from 'test/factories/make-question'
+import { AttachmentFractory } from 'test/factories/make-attachments'
 
 describe('Answer question (E2E)', () => {
   let app: INestApplication
@@ -14,11 +15,12 @@ describe('Answer question (E2E)', () => {
   let jwt: JwtService
   let studentFractory: StudentFractory
   let questionFactory: QuestionFactory
+  let attachmentFactory: AttachmentFractory
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule, DatabaseModule],
-      providers: [StudentFractory, QuestionFactory],
+      providers: [StudentFractory, QuestionFactory, AttachmentFractory],
     }).compile()
 
     app = moduleRef.createNestApplication()
@@ -30,6 +32,8 @@ describe('Answer question (E2E)', () => {
     studentFractory = moduleRef.get(StudentFractory)
 
     questionFactory = moduleRef.get(QuestionFactory)
+
+    attachmentFactory = moduleRef.get(AttachmentFractory)
 
     await app.init()
   })
@@ -45,13 +49,18 @@ describe('Answer question (E2E)', () => {
 
     const questionId = question.id.toString()
 
+    const attachment1 = await attachmentFactory.makePrismaAttachment()
+    const attachment2 = await attachmentFactory.makePrismaAttachment()
+
     const response = await request(app.getHttpServer())
       .post(`/questions/${questionId}/answers`)
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
         content: 'New answer',
+        attachments: [attachment1.id.toString(), attachment2.id.toString()],
       })
-
+    console.log(attachment1)
+    console.log(attachment2)
     expect(response.statusCode).toBe(201)
 
     const answerOnDatabase = await prisma.answer.findFirst({
@@ -61,5 +70,13 @@ describe('Answer question (E2E)', () => {
     })
 
     expect(answerOnDatabase).toBeTruthy()
+
+    const attachmentOnDataBase = await prisma.attachment.findMany({
+      where: {
+        questionId: answerOnDatabase?.id,
+      },
+    })
+
+    expect(attachmentOnDataBase).toHaveLength(2)
   })
 })
