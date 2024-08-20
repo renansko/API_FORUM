@@ -59,8 +59,6 @@ describe('Answer question (E2E)', () => {
         content: 'New answer',
         attachments: [attachment1.id.toString(), attachment2.id.toString()],
       })
-    console.log(attachment1)
-    console.log(attachment2)
     expect(response.statusCode).toBe(201)
 
     const answerOnDatabase = await prisma.answer.findFirst({
@@ -73,7 +71,7 @@ describe('Answer question (E2E)', () => {
 
     const attachmentOnDataBase = await prisma.attachment.findMany({
       where: {
-        questionId: answerOnDatabase?.id,
+        answerId: answerOnDatabase?.id,
       },
     })
 
