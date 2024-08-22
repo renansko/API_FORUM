@@ -46,7 +46,6 @@ export class UploadAndCreateAttachmentUseCase {
     })
 
     await this.attachmentRepository.create(attachment)
-    console.log(body)
     return right({
       attachment,
     })

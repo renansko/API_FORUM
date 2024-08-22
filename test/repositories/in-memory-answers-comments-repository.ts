@@ -46,7 +46,6 @@ export class InMemoryAnswerCommentRepository
           author: author.name,
         })
       })
-    console.log(answerComments)
     return answerComments
   }
 

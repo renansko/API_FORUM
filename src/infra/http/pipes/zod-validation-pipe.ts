@@ -19,6 +19,7 @@ export class ZodValidationPipe implements PipeTransform {
           message: 'Validation failed',
           statusCode: 400,
           errors: fromZodError(error),
+          metadata,
         })
       }
 

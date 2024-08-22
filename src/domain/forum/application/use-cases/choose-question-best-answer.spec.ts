@@ -7,24 +7,33 @@ import { ChooseQuestionBestAnswerUseCase } from './choose-question-best-answer'
 import { NotAllowedError } from '@/core/errors/errors/not-allowed-error'
 import { InMemoryQuestionAttachmentRepository } from 'test/repositories/in-memory-question-attachment-repository'
 import { InMemoryAnswerAttachmentRepository } from 'test/repositories/in-memory-answer-attachment-repository'
+import { InMemoryAttachmentRepository } from 'test/repositories/in-memory-attachment-repository'
+import { InMemoryRegisterStudentRepository } from 'test/repositories/in-memory-student-repository'
 
 let inMemoryAnswerAttachmentRepository: InMemoryAnswerAttachmentRepository
 let inMemoryQuestionAttachmentRepository: InMemoryQuestionAttachmentRepository
 let inMemoryQuestionRepository: InMemoryQuestionRepository
 let inMemoryAnswerRepository: InMemoryAnswerRepository
+let inMemoryAttachmentRepository: InMemoryAttachmentRepository
+let inMemoryStudentRegisterRepository: InMemoryRegisterStudentRepository
 let sut: ChooseQuestionBestAnswerUseCase
 
 describe('Choose Answer by id', () => {
   beforeEach(() => {
     inMemoryAnswerAttachmentRepository =
       new InMemoryAnswerAttachmentRepository()
+    inMemoryAttachmentRepository = new InMemoryAttachmentRepository()
+    inMemoryStudentRegisterRepository = new InMemoryRegisterStudentRepository()
+
+    inMemoryAnswerRepository = new InMemoryAnswerRepository(
+      inMemoryAnswerAttachmentRepository,
+    )
     inMemoryQuestionAttachmentRepository =
       new InMemoryQuestionAttachmentRepository()
     inMemoryQuestionRepository = new InMemoryQuestionRepository(
       inMemoryQuestionAttachmentRepository,
-    )
-    inMemoryAnswerRepository = new InMemoryAnswerRepository(
-      inMemoryAnswerAttachmentRepository,
+      inMemoryAttachmentRepository,
+      inMemoryStudentRegisterRepository,
     )
     sut = new ChooseQuestionBestAnswerUseCase(
       inMemoryAnswerRepository,
@@ -40,6 +49,7 @@ describe('Choose Answer by id', () => {
     })
 
     await inMemoryQuestionRepository.create(question)
+
     await inMemoryAnswerRepository.create(answer)
 
     await sut.execute({
