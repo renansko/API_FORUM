@@ -33,6 +33,7 @@
     "@types/supertest": "^6.0.2",
     "bcryptjs": "^2.4.3",
     "dayjs": "^1.11.12",
+    "ioredis": "^5.4.1",
     "lts": "^1.2.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.0",
